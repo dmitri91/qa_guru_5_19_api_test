@@ -19,13 +19,13 @@ class CustomSession(Session):
         self.base_url = base_url
         super().__init__()
 
-
     def request(self,method, url, *args, **kwargs) -> Response:
         response = super(CustomSession, self).request(method=method, url=self.base_url +  url, *args, **kwargs)
         msg = to_curl(response.request)
-        logging.info(msg)
+        status_code = response.status_code
+        logging.info(f'status_code={status_code}\n{msg}')
         with allure.step(f'{method} {url}'):
-            allure.attach(body=f'status_code={response.status_code}\n{msg}', name='Request curl', attachment_type=AttachmentType.TEXT, extension='txt')
+            allure.attach(body=f'status_code={status_code}\n{msg}', name='Request curl', attachment_type=AttachmentType.TEXT, extension='txt')
 
             try:
                 response_body = response.json()
